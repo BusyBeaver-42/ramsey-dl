@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/data_generator",
+    "crates/ramsey_theory",
+]
+resolver = "2"

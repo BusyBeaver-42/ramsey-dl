@@ -9,6 +9,10 @@ struct Cli {
     colors: u8,
 
     #[arg(short, long)]
+    #[arg(default_value_t = 100_000)]
+    samples: usize,
+
+    #[arg(short, long)]
     output_file: Option<PathBuf>,
 
     #[arg(short, long)]
