@@ -3,6 +3,9 @@ use std::cmp;
 
 type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
 
+// TODO: struct
+type Coloring = Vec<usize>;
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd)]
 pub enum PlayError {
     LimitReached,
@@ -71,6 +74,7 @@ impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, 
         self.legal_moves().choose(rng).copied()
     }
 
+    // TODO: move to Coloring struct
     pub fn random_coloring<R>(rng: &mut R) -> Self
     where
         R: Rng + ?Sized,
@@ -85,20 +89,44 @@ impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, 
         coloring
     }
 
-    pub fn random_partial_coloring<R>(rng: &mut R, min_size: usize) -> Self
+    // TODO: inconsistent, move to Coloring struct
+    pub fn random_partial_coloring<R>(rng: &mut R) -> Coloring
     where
         R: Rng + ?Sized,
     {
-        if min_size >= SIZE_LIMIT {
-            panic!("Minimum size cannot be greater than SIZE_LIMIT.");
-        }
+        let coloring = Self::random_coloring(rng);
+        let size = rng.gen_range(0..coloring.size);
 
-        loop {
-            let coloring = Self::random_coloring(rng);
-            if coloring.size >= min_size {
-                return coloring;
+        let mut res = vec![0; size];
+
+        for color in 0..N_COLORS {
+            for num in 0..size {
+                if coloring.partition[color][num] {
+                    res[num] = color;
+                }
             }
         }
+
+        // TODO: sort in Coloring struct
+        let mut colors_seen = 0;
+        // TODO: meh, Option?
+        let mut color_order = [N_COLORS + 1; N_COLORS];
+        for &color in res.iter() {
+            if color_order[color] == N_COLORS + 1 {
+                color_order[color] = colors_seen;
+                colors_seen += 1;
+
+                if colors_seen == N_COLORS {
+                    break;
+                }
+            }
+        }
+
+        res.iter_mut().for_each(|color| {
+            *color = color_order[*color];
+        });
+
+        res
     }
 }
 
