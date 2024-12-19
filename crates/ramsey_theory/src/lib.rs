@@ -1,20 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
-mod problems;
+pub mod problems;
 pub mod sequence_coloring;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];

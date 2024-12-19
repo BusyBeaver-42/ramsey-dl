@@ -1,13 +1,6 @@
+use crate::Array2D;
 use assert_const_generics::*;
 use std::cmp;
-
-pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
-
-#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd)]
-pub enum PlayError {
-    LimitReached,
-    IllegalMove,
-}
 
 pub trait UpperBound {
     const BOUND: usize;

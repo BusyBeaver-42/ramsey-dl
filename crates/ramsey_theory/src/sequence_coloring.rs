@@ -1,9 +1,90 @@
-use crate::problems::{Array2D, PlayError, SequenceProblem};
+use crate::{Array2D, problems::SequenceProblem};
 use rand::{Rng, seq::SliceRandom};
-use std::marker::PhantomData;
+use std::{marker::PhantomData, ops::Deref};
 
-// TODO: struct
-type Coloring = Vec<usize>;
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub struct Coloring<const N_COLORS: usize>(Vec<usize>);
+
+impl<const N_COLORS: usize> Coloring<N_COLORS> {
+    pub fn random<P, R>(rng: &mut R) -> Self
+    where
+        R: Rng + ?Sized,
+        P: SequenceProblem<N_COLORS>,
+        [(); P::BOUND]:,
+    {
+        let mut coloring = SequenceColoring::<N_COLORS, P>::new();
+
+        while let Some(color) = coloring.random_move(rng) {
+            // if random_move returns Some(color) then it is a legal move so this should not panic
+            coloring.play(color).expect("Illegal move.");
+        }
+
+        Self::from(coloring)
+    }
+
+    pub fn random_partial<P, R>(rng: &mut R) -> Self
+    where
+        R: Rng + ?Sized,
+        P: SequenceProblem<N_COLORS>,
+        [(); P::BOUND]:,
+    {
+        let mut coloring = Self::random::<P, _>(rng);
+
+        let size = rng.gen_range(0..coloring.len());
+
+        coloring.truncate(size);
+        coloring.shrink_to_fit();
+
+        coloring
+    }
+
+    pub fn truncate(&mut self, size: usize) {
+        self.0.truncate(size);
+    }
+
+    pub fn shrink_to_fit(&mut self) {
+        self.0.shrink_to_fit()
+    }
+
+    pub fn order_colors(&mut self) {
+        let mut colors_seen = 0;
+        let mut color_order = [None; N_COLORS];
+
+        for color in self.0.iter_mut() {
+            if color_order[*color].is_none() {
+                color_order[*color] = Some(colors_seen);
+                colors_seen += 1;
+            }
+
+            *color = color_order[*color].unwrap();
+        }
+    }
+}
+
+// do not implement DerefMut, otherwise the user could put an invalid color in the Vec
+impl<const N_COLORS: usize> Deref for Coloring<N_COLORS> {
+    type Target = Vec<usize>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<const N_COLORS: usize> FromIterator<usize> for Coloring<N_COLORS> {
+    fn from_iter<I>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = usize>,
+    {
+        Self(iter.into_iter().collect())
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd)]
+pub enum PlayError {
+    InvalidColor,
+    LimitReached,
+    IllegalMove,
+}
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct SequenceColoring<const N_COLORS: usize, P>
@@ -42,7 +123,9 @@ where
     }
 
     pub fn play(&mut self, color: usize) -> Result<(), PlayError> {
-        // TODO: generic over problem
+        if color >= N_COLORS {
+            return Err(PlayError::InvalidColor);
+        }
         if self.size >= P::BOUND {
             return Err(PlayError::LimitReached);
         }
@@ -72,61 +155,6 @@ where
     {
         self.legal_moves().choose(rng).copied()
     }
-
-    // TODO: move to Coloring struct
-    pub fn random_coloring<R>(rng: &mut R) -> Self
-    where
-        R: Rng + ?Sized,
-    {
-        let mut coloring = Self::new();
-
-        while let Some(color) = coloring.random_move(rng) {
-            // if random_move returns Some(color) then it is a legal move so this should not happen
-            coloring.play(color).expect("Illegal move.");
-        }
-
-        coloring
-    }
-
-    // TODO: inconsistent, move to Coloring struct
-    pub fn random_partial_coloring<R>(rng: &mut R) -> Coloring
-    where
-        R: Rng + ?Sized,
-    {
-        let coloring = Self::random_coloring(rng);
-        let size = rng.gen_range(0..coloring.size);
-
-        let mut res = vec![0; size];
-
-        for color in 0..N_COLORS {
-            for num in 0..size {
-                if coloring.partition[color][num] {
-                    res[num] = color;
-                }
-            }
-        }
-
-        // TODO: sort in Coloring struct
-        let mut colors_seen = 0;
-        // TODO: meh, Option?
-        let mut color_order = [N_COLORS + 1; N_COLORS];
-        for &color in res.iter() {
-            if color_order[color] == N_COLORS + 1 {
-                color_order[color] = colors_seen;
-                colors_seen += 1;
-
-                if colors_seen == N_COLORS {
-                    break;
-                }
-            }
-        }
-
-        res.iter_mut().for_each(|color| {
-            *color = color_order[*color];
-        });
-
-        res
-    }
 }
 
 impl<const N_COLORS: usize, P> Default for SequenceColoring<N_COLORS, P>
@@ -155,7 +183,17 @@ where
     }
 }
 
-struct SequenceColoringIntoIter<const N_COLORS: usize, P>
+impl<const N_COLORS: usize, P> From<SequenceColoring<N_COLORS, P>> for Coloring<N_COLORS>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
+    fn from(coloring: SequenceColoring<N_COLORS, P>) -> Self {
+        coloring.into_iter().collect()
+    }
+}
+
+pub struct SequenceColoringIntoIter<const N_COLORS: usize, P>
 where
     P: SequenceProblem<N_COLORS>,
     [(); P::BOUND]:,
