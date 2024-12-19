@@ -1,3 +1,4 @@
+use assert_const_generics::*;
 use std::cmp;
 
 pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
@@ -14,7 +15,7 @@ pub trait UpperBound {
 
 #[macro_export]
 macro_rules! upper_bound_impl {
-    ($({$($generics:tt)+})? $problem:ty = $value:literal $(where $($generics_bounds:tt)+)?) => {
+    ($({$($generics:tt)+})? $problem:ty = $value:expr $(; where $($generics_bounds:tt)+)?) => {
         impl$(<$($generics)+>)? $crate::problems::UpperBound for $problem
         $(where $($generics_bounds)+)?
         {
@@ -98,4 +99,52 @@ where
 
         dst.iter_mut().zip(src).for_each(|(a, &b)| *a &= !b);
     }
+}
+
+#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd, Default)]
+pub struct VanDerWaerden<const N_COLORS: usize, const PROGRESSION_LEN: usize>
+where
+    Self: UpperBound;
+
+upper_bound_impl! {
+    { const PROGRESSION_LEN: usize } VanDerWaerden<1, PROGRESSION_LEN> = PROGRESSION_LEN - 1 ;
+    where
+        Assert<{ PROGRESSION_LEN > 1 }>: IsTrue,
+}
+upper_bound_impl! {
+    { const N_COLORS: usize } VanDerWaerden<N_COLORS, 2> = N_COLORS ;
+    where
+        Assert<{ N_COLORS > 1 }>: IsTrue,
+}
+upper_bound_impl! { VanDerWaerden<2, 3> = 8 }
+upper_bound_impl! { VanDerWaerden<2, 4> = 34 }
+upper_bound_impl! { VanDerWaerden<2, 5> = 177 }
+upper_bound_impl! { VanDerWaerden<3, 3> = 26 }
+upper_bound_impl! { VanDerWaerden<3, 4> = 292 }
+upper_bound_impl! { VanDerWaerden<4, 3> = 75 }
+upper_bound_impl! { VanDerWaerden<5, 3> = 180 }
+upper_bound_impl! { VanDerWaerden<6, 3> = 242 }
+
+impl<const PROGRESSION_LEN: usize, const N_COLORS: usize> SequenceProblem<N_COLORS>
+    for VanDerWaerden<PROGRESSION_LEN, N_COLORS>
+where
+    Self: UpperBound,
+{
+    fn play(
+        size: &mut usize,
+        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        color: usize,
+    ) {
+        let _ignore = (size, partition, possible, color);
+        todo!();
+    }
+}
+
+mod assert_const_generics {
+    pub enum Assert<const CHECK: bool> {}
+
+    pub trait IsTrue {}
+
+    impl IsTrue for Assert<true> {}
 }
