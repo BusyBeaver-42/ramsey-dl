@@ -177,6 +177,7 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter {
+            size: self.size,
             num: 0,
             partition: self.partition,
         }
@@ -198,6 +199,7 @@ where
     P: SequenceProblem<N_COLORS>,
     [(); P::BOUND]:,
 {
+    size: usize,
     num: usize,
     partition: Array2D<N_COLORS, { P::BOUND }, bool>,
 }
@@ -210,7 +212,7 @@ where
     type Item = usize;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.num == P::BOUND {
+        if self.num == self.size {
             return None;
         }
 
@@ -219,4 +221,17 @@ where
 
         color
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let remaining = self.size - self.num;
+
+        (remaining, Some(remaining))
+    }
+}
+
+impl<const N_COLORS: usize, P> ExactSizeIterator for SequenceColoringIntoIter<N_COLORS, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
 }
