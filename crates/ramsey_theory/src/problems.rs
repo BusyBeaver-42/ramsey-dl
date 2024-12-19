@@ -63,3 +63,37 @@ where
         dst.iter_mut().zip(src).for_each(|(a, &b)| *a &= !b);
     }
 }
+
+#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd, Default)]
+pub struct WeakSchur<const N_COLORS: usize>
+where
+    Self: UpperBound;
+
+upper_bound_impl! { WeakSchur<1> = 2 }
+upper_bound_impl! { WeakSchur<2> = 8 }
+upper_bound_impl! { WeakSchur<3> = 23 }
+upper_bound_impl! { WeakSchur<4> = 66 }
+upper_bound_impl! { WeakSchur<5> = 200 }
+
+impl<const N_COLORS: usize> SequenceProblem<N_COLORS> for WeakSchur<N_COLORS>
+where
+    Self: UpperBound,
+{
+    fn play(
+        size: &mut usize,
+        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        color: usize,
+    ) {
+        partition[color][*size] = true;
+        *size += 1;
+
+        let max_updated = cmp::min(2 * *size - 1, Self::BOUND);
+        let max_updater = max_updated - *size;
+
+        let dst = &mut possible[color][*size..max_updated];
+        let src = &partition[color][..max_updater];
+
+        dst.iter_mut().zip(src).for_each(|(a, &b)| *a &= !b);
+    }
+}
