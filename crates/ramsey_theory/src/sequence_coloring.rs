@@ -1,30 +1,33 @@
-use rand::{seq::SliceRandom, Rng};
-use std::cmp;
-
-type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
+use crate::problems::{Array2D, PlayError, SequenceProblem};
+use rand::{Rng, seq::SliceRandom};
+use std::{cmp, marker::PhantomData};
 
 // TODO: struct
 type Coloring = Vec<usize>;
 
-#[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd)]
-pub enum PlayError {
-    LimitReached,
-    IllegalMove,
-}
-
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub struct SequenceColoring<const N_COLORS: usize, const SIZE_LIMIT: usize> {
+pub struct SequenceColoring<const N_COLORS: usize, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
     size: usize,
-    partition: Array2D<N_COLORS, SIZE_LIMIT, bool>,
-    possible: Array2D<N_COLORS, SIZE_LIMIT, bool>,
+    partition: Array2D<N_COLORS, { P::BOUND }, bool>,
+    possible: Array2D<N_COLORS, { P::BOUND }, bool>,
+    _problem: PhantomData<P>,
 }
 
-impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, SIZE_LIMIT> {
+impl<const N_COLORS: usize, P> SequenceColoring<N_COLORS, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
     pub const fn new() -> Self {
         Self {
             size: 0,
-            partition: [[false; SIZE_LIMIT]; N_COLORS],
-            possible: [[true; SIZE_LIMIT]; N_COLORS],
+            partition: [[false; P::BOUND]; N_COLORS],
+            possible: [[true; P::BOUND]; N_COLORS],
+            _problem: PhantomData,
         }
     }
 
@@ -35,12 +38,12 @@ impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, 
 
     #[inline]
     pub const fn is_full(&self) -> bool {
-        self.size == SIZE_LIMIT - 1
+        self.size == P::BOUND - 1
     }
 
     pub fn play(&mut self, color: usize) -> Result<(), PlayError> {
         // TODO: generic over problem
-        if self.size >= SIZE_LIMIT {
+        if self.size >= P::BOUND {
             return Err(PlayError::LimitReached);
         }
         if !self.possible[self.size][color] {
@@ -50,7 +53,7 @@ impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, 
         self.partition[color][self.size] = true;
         self.size += 1;
 
-        let max_updated = cmp::min(2 * self.size, SIZE_LIMIT);
+        let max_updated = cmp::min(2 * self.size, P::BOUND);
         let max_updater = max_updated - self.size;
 
         let dst = &mut self.possible[color][self.size..max_updated];
@@ -130,8 +133,10 @@ impl<const N_COLORS: usize, const SIZE_LIMIT: usize> SequenceColoring<N_COLORS, 
     }
 }
 
-impl<const N_COLORS: usize, const SIZE_LIMIT: usize> Default
-    for SequenceColoring<N_COLORS, SIZE_LIMIT>
+impl<const N_COLORS: usize, P> Default for SequenceColoring<N_COLORS, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
 {
     fn default() -> Self {
         Self::new()

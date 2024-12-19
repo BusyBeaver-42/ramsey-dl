@@ -1,3 +1,6 @@
+#![feature(generic_const_exprs)]
+
+mod problems;
 pub mod sequence_coloring;
 
 pub fn add(left: u64, right: u64) -> u64 {
