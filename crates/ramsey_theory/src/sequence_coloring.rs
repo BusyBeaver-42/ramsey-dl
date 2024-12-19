@@ -138,3 +138,47 @@ where
         Self::new()
     }
 }
+
+impl<const N_COLORS: usize, P> IntoIterator for SequenceColoring<N_COLORS, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
+    type Item = usize;
+    type IntoIter = SequenceColoringIntoIter<N_COLORS, P>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Self::IntoIter {
+            num: 0,
+            partition: self.partition,
+        }
+    }
+}
+
+struct SequenceColoringIntoIter<const N_COLORS: usize, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
+    num: usize,
+    partition: Array2D<N_COLORS, { P::BOUND }, bool>,
+}
+
+impl<const N_COLORS: usize, P> Iterator for SequenceColoringIntoIter<N_COLORS, P>
+where
+    P: SequenceProblem<N_COLORS>,
+    [(); P::BOUND]:,
+{
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.num == P::BOUND {
+            return None;
+        }
+
+        let color = (0..N_COLORS).find(|&color| self.partition[color][self.num]);
+        self.num += 1;
+
+        color
+    }
+}
