@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive"] }
+num_cpus = "1.16.0"
+ramsey_theory = { path = "../ramsey_theory" }
+rand = "0.8.5"

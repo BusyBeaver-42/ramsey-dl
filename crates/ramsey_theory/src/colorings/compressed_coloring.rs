@@ -14,6 +14,16 @@ impl<const N_COLORS: usize> CompressedColoring<N_COLORS> {
     } else {
         1 + CompressedColors::MAX.ilog(N_COLORS as CompressedColors) as usize
     };
+
+    pub fn decompress(&self) -> impl Iterator<Item = usize> {
+        (0..self.size).map(|num| {
+            let div = num / Self::COLORS_PER_ELEM;
+            let rem = num % Self::COLORS_PER_ELEM;
+
+            ((self.compressed[div] / (Self::COLORS_PER_ELEM as CompressedColors).pow(rem as u32))
+                % (Self::COLORS_PER_ELEM as CompressedColors)) as usize
+        })
+    }
 }
 
 impl<const N_COLORS: usize> From<Coloring<N_COLORS>> for CompressedColoring<N_COLORS> {
