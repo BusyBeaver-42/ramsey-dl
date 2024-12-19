@@ -1,6 +1,6 @@
 use crate::problems::{Array2D, PlayError, SequenceProblem};
 use rand::{Rng, seq::SliceRandom};
-use std::{cmp, marker::PhantomData};
+use std::marker::PhantomData;
 
 // TODO: struct
 type Coloring = Vec<usize>;
@@ -50,16 +50,12 @@ where
             return Err(PlayError::IllegalMove);
         }
 
-        self.partition[color][self.size] = true;
-        self.size += 1;
-
-        let max_updated = cmp::min(2 * self.size, P::BOUND);
-        let max_updater = max_updated - self.size;
-
-        let dst = &mut self.possible[color][self.size..max_updated];
-        let src = &self.partition[color][..max_updater];
-
-        dst.iter_mut().zip(src).for_each(|(a, &b)| *a &= !b);
+        P::play(
+            &mut self.size,
+            &mut self.partition,
+            &mut self.possible,
+            color,
+        );
 
         Ok(())
     }

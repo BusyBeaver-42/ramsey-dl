@@ -1,5 +1,4 @@
-use std::fmt::Debug;
-use std::hash::Hash;
+use std::cmp;
 
 pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
 
@@ -28,7 +27,7 @@ pub trait SequenceProblem<const N_COLORS: usize>: UpperBound {
         partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
         possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
         color: usize,
-    ) -> Result<(), PlayError>;
+    );
 }
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone, Hash, Ord, PartialOrd, Default)]
@@ -51,7 +50,16 @@ where
         partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
         possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
         color: usize,
-    ) -> Result<(), PlayError> {
-        todo!()
+    ) {
+        partition[color][*size] = true;
+        *size += 1;
+
+        let max_updated = cmp::min(2 * *size, Self::BOUND);
+        let max_updater = max_updated - *size;
+
+        let dst = &mut possible[color][*size..max_updated];
+        let src = &partition[color][..max_updater];
+
+        dst.iter_mut().zip(src).for_each(|(a, &b)| *a &= !b);
     }
 }
