@@ -14,9 +14,11 @@ pub trait UpperBound {
 
 #[macro_export]
 macro_rules! upper_bound_impl {
-    ($problem:ty = $bound:literal) => {
-        impl $crate::problems::UpperBound for $problem {
-            const BOUND: usize = $bound + 1;
+    ($({$($generics:tt)+})? $problem:ty = $value:literal $(where $($generics_bounds:tt)+)?) => {
+        impl$(<$($generics)+>)? $crate::problems::UpperBound for $problem
+        $(where $($generics_bounds)+)?
+        {
+            const BOUND: usize = $value + 1;
         }
     };
 }
