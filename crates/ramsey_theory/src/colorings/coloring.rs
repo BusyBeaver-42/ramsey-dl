@@ -1,7 +1,7 @@
 use super::sequence_coloring::SequenceColoring;
 use crate::problems::SequenceProblem;
 use rand::Rng;
-use std::ops::Deref;
+use std::{ops::Deref, vec::IntoIter as VecIntoIter};
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub struct Coloring<const N_COLORS: usize>(Vec<usize>);
@@ -68,6 +68,15 @@ impl<const N_COLORS: usize> Deref for Coloring<N_COLORS> {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl<const N_COLORS: usize> IntoIterator for Coloring<N_COLORS> {
+    type Item = usize;
+    type IntoIter = VecIntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 
