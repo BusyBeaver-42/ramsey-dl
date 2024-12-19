@@ -1,5 +1,4 @@
-use crate::Array2D;
-use assert_const_generics::*;
+use crate::{Array2D, assert_const_generics::*};
 use std::cmp;
 
 pub trait UpperBound {
@@ -132,12 +131,4 @@ where
         let _ignore = (size, partition, possible, color);
         todo!();
     }
-}
-
-mod assert_const_generics {
-    pub enum Assert<const CHECK: bool> {}
-
-    pub trait IsTrue {}
-
-    impl IsTrue for Assert<true> {}
 }
