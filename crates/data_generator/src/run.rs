@@ -42,8 +42,9 @@ pub fn run<P>(
     [(); P::BOUND]:,
     [(); P::N_COLORS]:,
 {
-    let output_filename =
+    let mut output_filename =
         output_filename.unwrap_or_else(|| Local::now().format("%Y%m%d-%H%M%S").to_string().into());
+    output_filename.set_extension("npz");
 
     let n_workers = n_workers.unwrap_or_else(num_cpus::get_physical);
 

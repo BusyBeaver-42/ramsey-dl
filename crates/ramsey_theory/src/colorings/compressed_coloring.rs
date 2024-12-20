@@ -12,7 +12,7 @@ impl<const N_COLORS: usize> CompressedColoring<N_COLORS> {
     pub const COLORS_PER_ELEM: usize = if N_COLORS.is_power_of_two() {
         (CompressedColors::BITS / N_COLORS.ilog2()) as usize
     } else {
-        1 + CompressedColors::MAX.ilog(N_COLORS as CompressedColors) as usize
+        CompressedColors::MAX.ilog(N_COLORS as CompressedColors) as usize
     };
 
     pub fn size(&self) -> usize {
@@ -28,8 +28,8 @@ impl<const N_COLORS: usize> CompressedColoring<N_COLORS> {
             let div = num / Self::COLORS_PER_ELEM;
             let rem = num % Self::COLORS_PER_ELEM;
 
-            ((self.compressed[div] / (Self::COLORS_PER_ELEM as CompressedColors).pow(rem as u32))
-                % (Self::COLORS_PER_ELEM as CompressedColors)) as usize
+            ((self.compressed[div] / (N_COLORS as CompressedColors).pow(rem as u32))
+                % (N_COLORS as CompressedColors)) as usize
         })
     }
 

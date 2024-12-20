@@ -54,7 +54,7 @@ where
         if self.size >= P::BOUND {
             return Err(PlayError::LimitReached);
         }
-        if !self.possible[self.size][color] {
+        if !self.possible[color][self.size] {
             return Err(PlayError::IllegalMove);
         }
 
