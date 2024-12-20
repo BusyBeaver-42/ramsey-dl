@@ -12,6 +12,8 @@ mod coloring_generation;
 mod label_generation;
 mod save_data;
 
+// Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
+#[allow(clippy::eq_op)]
 pub fn run<P>(
     output_filename: Option<PathBuf>,
     n_samples: usize,

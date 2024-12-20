@@ -9,6 +9,8 @@ use std::{
     thread,
 };
 
+// Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
+#[allow(clippy::eq_op)]
 fn coloring_generation<P, R>(
     n_samples: usize,
     rng: &mut R,
@@ -31,6 +33,8 @@ where
     colorings
 }
 
+// Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
+#[allow(clippy::eq_op)]
 fn mpsc_coloring_generator<P>(
     n_samples: usize,
     n_workers: usize,
@@ -81,6 +85,8 @@ where
     colorings
 }
 
+// Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
+#[allow(clippy::eq_op)]
 pub fn generate_colorings<P>(
     n_samples: usize,
     n_workers: usize,
