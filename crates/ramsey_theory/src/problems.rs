@@ -16,11 +16,13 @@ macro_rules! upper_bound_impl {
     };
 }
 
-pub trait SequenceProblem<const N_COLORS: usize>: UpperBound {
+pub trait SequenceProblem: UpperBound {
+    const N_COLORS: usize;
+
     fn play(
         size: &mut usize,
-        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
-        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        partition: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
+        possible: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
         color: usize,
     );
 }
@@ -36,14 +38,16 @@ upper_bound_impl! { Schur<3> = 13 }
 upper_bound_impl! { Schur<4> = 44 }
 upper_bound_impl! { Schur<5> = 160 }
 
-impl<const N_COLORS: usize> SequenceProblem<N_COLORS> for Schur<N_COLORS>
+impl<const N_COLORS: usize> SequenceProblem for Schur<N_COLORS>
 where
     Self: UpperBound,
 {
+    const N_COLORS: usize = N_COLORS;
+
     fn play(
         size: &mut usize,
-        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
-        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        partition: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
+        possible: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
         color: usize,
     ) {
         partition[color][*size] = true;
@@ -70,14 +74,16 @@ upper_bound_impl! { WeakSchur<3> = 23 }
 upper_bound_impl! { WeakSchur<4> = 66 }
 upper_bound_impl! { WeakSchur<5> = 200 }
 
-impl<const N_COLORS: usize> SequenceProblem<N_COLORS> for WeakSchur<N_COLORS>
+impl<const N_COLORS: usize> SequenceProblem for WeakSchur<N_COLORS>
 where
     Self: UpperBound,
 {
+    const N_COLORS: usize = N_COLORS;
+
     fn play(
         size: &mut usize,
-        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
-        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        partition: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
+        possible: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
         color: usize,
     ) {
         partition[color][*size] = true;
@@ -117,15 +123,17 @@ upper_bound_impl! { VanDerWaerden<4, 3> = 75 }
 upper_bound_impl! { VanDerWaerden<5, 3> = 180 }
 upper_bound_impl! { VanDerWaerden<6, 3> = 242 }
 
-impl<const PROGRESSION_LEN: usize, const N_COLORS: usize> SequenceProblem<N_COLORS>
+impl<const PROGRESSION_LEN: usize, const N_COLORS: usize> SequenceProblem
     for VanDerWaerden<PROGRESSION_LEN, N_COLORS>
 where
     Self: UpperBound,
 {
+    const N_COLORS: usize = N_COLORS;
+
     fn play(
         size: &mut usize,
-        partition: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
-        possible: &mut Array2D<N_COLORS, { Self::BOUND }, bool>,
+        partition: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
+        possible: &mut Array2D<{ Self::N_COLORS }, { Self::BOUND }, bool>,
         color: usize,
     ) {
         let _ignore = (size, partition, possible, color);

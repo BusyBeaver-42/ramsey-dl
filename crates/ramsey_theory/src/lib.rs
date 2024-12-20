@@ -1,14 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
-mod assert_const_generics {
-    pub enum Assert<const CHECK: bool> {}
-
-    pub trait IsTrue {}
-
-    impl IsTrue for Assert<true> {}
-}
-
+pub mod assert_const_generics;
 pub mod colorings;
 pub mod problems;
 

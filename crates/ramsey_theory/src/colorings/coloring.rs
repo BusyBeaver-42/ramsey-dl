@@ -1,4 +1,5 @@
 use super::sequence_coloring::SequenceColoring;
+use crate::assert_const_generics::*;
 use crate::problems::SequenceProblem;
 use rand::Rng;
 use std::{ops::Deref, vec::IntoIter as VecIntoIter};
@@ -10,10 +11,12 @@ impl<const N_COLORS: usize> Coloring<N_COLORS> {
     pub fn random<P, R>(rng: &mut R) -> Self
     where
         R: Rng + ?Sized,
-        P: SequenceProblem<N_COLORS>,
+        P: SequenceProblem,
+        Assert<{ N_COLORS == P::N_COLORS }>: IsTrue,
         [(); P::BOUND]:,
+        [(); P::N_COLORS]:,
     {
-        let mut coloring = SequenceColoring::<N_COLORS, P>::new();
+        let mut coloring = SequenceColoring::<P>::new();
 
         while let Some(color) = coloring.random_move(rng) {
             // if random_move returns Some(color) then it is a legal move so this should not panic
@@ -26,8 +29,10 @@ impl<const N_COLORS: usize> Coloring<N_COLORS> {
     pub fn random_partial<P, R>(rng: &mut R) -> Self
     where
         R: Rng + ?Sized,
-        P: SequenceProblem<N_COLORS>,
+        P: SequenceProblem,
+        Assert<{ N_COLORS == P::N_COLORS }>: IsTrue,
         [(); P::BOUND]:,
+        [(); P::N_COLORS]:,
     {
         let mut coloring = Self::random::<P, _>(rng);
 
@@ -89,12 +94,14 @@ impl<const N_COLORS: usize> FromIterator<usize> for Coloring<N_COLORS> {
     }
 }
 
-impl<const N_COLORS: usize, P> From<SequenceColoring<N_COLORS, P>> for Coloring<N_COLORS>
+impl<const N_COLORS: usize, P> From<SequenceColoring<P>> for Coloring<N_COLORS>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
+    Assert<{ N_COLORS == P::N_COLORS }>: IsTrue,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
-    fn from(coloring: SequenceColoring<N_COLORS, P>) -> Self {
+    fn from(coloring: SequenceColoring<P>) -> Self {
         coloring.into_iter().collect()
     }
 }

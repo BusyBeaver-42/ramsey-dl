@@ -10,27 +10,29 @@ pub enum PlayError {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub struct SequenceColoring<const N_COLORS: usize, P>
+pub struct SequenceColoring<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     size: usize,
-    partition: Array2D<N_COLORS, { P::BOUND }, bool>,
-    possible: Array2D<N_COLORS, { P::BOUND }, bool>,
+    partition: Array2D<{ P::N_COLORS }, { P::BOUND }, bool>,
+    possible: Array2D<{ P::N_COLORS }, { P::BOUND }, bool>,
     _problem: PhantomData<P>,
 }
 
-impl<const N_COLORS: usize, P> SequenceColoring<N_COLORS, P>
+impl<P> SequenceColoring<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     pub const fn new() -> Self {
         Self {
             size: 0,
-            partition: [[false; P::BOUND]; N_COLORS],
-            possible: [[true; P::BOUND]; N_COLORS],
+            partition: [[false; P::BOUND]; P::N_COLORS],
+            possible: [[true; P::BOUND]; P::N_COLORS],
             _problem: PhantomData,
         }
     }
@@ -46,7 +48,7 @@ where
     }
 
     pub fn play(&mut self, color: usize) -> Result<(), PlayError> {
-        if color >= N_COLORS {
+        if color >= P::N_COLORS {
             return Err(PlayError::InvalidColor);
         }
         if self.size >= P::BOUND {
@@ -67,7 +69,7 @@ where
     }
 
     pub fn legal_moves(&self) -> Vec<usize> {
-        (0..N_COLORS)
+        (0..P::N_COLORS)
             .filter(|&color| self.possible[color][self.size])
             .collect()
     }
@@ -80,23 +82,25 @@ where
     }
 }
 
-impl<const N_COLORS: usize, P> Default for SequenceColoring<N_COLORS, P>
+impl<P> Default for SequenceColoring<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<const N_COLORS: usize, P> IntoIterator for SequenceColoring<N_COLORS, P>
+impl<P> IntoIterator for SequenceColoring<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     type Item = usize;
-    type IntoIter = SequenceColoringIntoIter<N_COLORS, P>;
+    type IntoIter = SequenceColoringIntoIter<P>;
 
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter {
@@ -107,20 +111,22 @@ where
     }
 }
 
-pub struct SequenceColoringIntoIter<const N_COLORS: usize, P>
+pub struct SequenceColoringIntoIter<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     size: usize,
     num: usize,
-    partition: Array2D<N_COLORS, { P::BOUND }, bool>,
+    partition: Array2D<{ P::N_COLORS }, { P::BOUND }, bool>,
 }
 
-impl<const N_COLORS: usize, P> Iterator for SequenceColoringIntoIter<N_COLORS, P>
+impl<P> Iterator for SequenceColoringIntoIter<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     type Item = usize;
 
@@ -129,7 +135,7 @@ where
             return None;
         }
 
-        let color = (0..N_COLORS).find(|&color| self.partition[color][self.num]);
+        let color = (0..P::N_COLORS).find(|&color| self.partition[color][self.num]);
         self.num += 1;
 
         color
@@ -142,9 +148,10 @@ where
     }
 }
 
-impl<const N_COLORS: usize, P> ExactSizeIterator for SequenceColoringIntoIter<N_COLORS, P>
+impl<P> ExactSizeIterator for SequenceColoringIntoIter<P>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
 }
