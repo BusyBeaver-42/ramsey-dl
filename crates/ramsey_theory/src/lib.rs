@@ -16,7 +16,7 @@ pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMN
 
 pub use colorings::{
     coloring::Coloring,
-    compressed_coloring::CompressedColoring,
+    compressed_coloring::{CompressedColoring, CompressedColors},
     sequence_coloring::{PlayError, SequenceColoring},
 };
 pub use problems::SequenceProblem;

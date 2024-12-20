@@ -1,6 +1,7 @@
 use super::coloring::Coloring;
-
-type CompressedColors = u32;
+use ndarray::Array1;
+use std::iter;
+pub type CompressedColors = u32;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub struct CompressedColoring<const N_COLORS: usize> {
@@ -15,6 +16,14 @@ impl<const N_COLORS: usize> CompressedColoring<N_COLORS> {
         1 + CompressedColors::MAX.ilog(N_COLORS as CompressedColors) as usize
     };
 
+    pub fn size(&self) -> usize {
+        self.size
+    }
+
+    pub fn compressed_len(&self) -> usize {
+        self.compressed.len()
+    }
+
     pub fn decompress(&self) -> impl Iterator<Item = usize> {
         (0..self.size).map(|num| {
             let div = num / Self::COLORS_PER_ELEM;
@@ -23,6 +32,25 @@ impl<const N_COLORS: usize> CompressedColoring<N_COLORS> {
             ((self.compressed[div] / (Self::COLORS_PER_ELEM as CompressedColors).pow(rem as u32))
                 % (Self::COLORS_PER_ELEM as CompressedColors)) as usize
         })
+    }
+
+    pub fn pad_to(&mut self, len: usize) {
+        if self.compressed.len() < len {
+            let count = len - self.compressed.len();
+            self.compressed.extend(iter::repeat_n(0, count));
+        }
+    }
+
+    pub fn pad_to_longest(colorings: &mut [Self]) {
+        let max_len = colorings
+            .iter()
+            .map(|coloring| coloring.compressed_len())
+            .max()
+            .expect("The slice is empty");
+
+        colorings
+            .iter_mut()
+            .for_each(|coloring| coloring.pad_to(max_len));
     }
 }
 
@@ -41,5 +69,11 @@ impl<const N_COLORS: usize> From<Coloring<N_COLORS>> for CompressedColoring<N_CO
             compressed,
             size: coloring.len(),
         }
+    }
+}
+
+impl<const N_COLORS: usize> From<CompressedColoring<N_COLORS>> for Array1<CompressedColors> {
+    fn from(coloring: CompressedColoring<N_COLORS>) -> Self {
+        Array1::from(coloring.compressed)
     }
 }
