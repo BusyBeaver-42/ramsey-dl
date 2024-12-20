@@ -1,4 +1,4 @@
-use ramsey_theory::{Coloring, CompressedColoring, SequenceProblem};
+use ramsey_theory::{Coloring, CompressedColoring, SequenceProblem, assert_const_generics::*};
 use rand::{Rng, thread_rng};
 use std::{
     collections::HashSet,
@@ -9,19 +9,21 @@ use std::{
     thread,
 };
 
-fn coloring_generation<const N_COLORS: usize, P, R>(
+fn coloring_generation<P, R>(
     n_samples: usize,
     rng: &mut R,
-) -> HashSet<CompressedColoring<N_COLORS>>
+) -> HashSet<CompressedColoring<{ P::N_COLORS }>>
 where
     R: Rng + ?Sized,
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     let mut colorings = HashSet::with_capacity(n_samples);
 
     while colorings.len() < n_samples {
-        let coloring = Coloring::<N_COLORS>::random_partial::<P, _>(rng);
+        let coloring = Coloring::<{ P::N_COLORS }>::random_partial::<P, _>(rng);
         let compressed = CompressedColoring::from(coloring);
         colorings.insert(compressed);
     }
@@ -29,14 +31,16 @@ where
     colorings
 }
 
-fn mpsc_coloring_generator<const N_COLORS: usize, P>(
+fn mpsc_coloring_generator<P>(
     n_samples: usize,
     n_workers: usize,
     chunk_size: usize,
-) -> HashSet<CompressedColoring<N_COLORS>>
+) -> HashSet<CompressedColoring<{ P::N_COLORS }>>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     let mut colorings = HashSet::with_capacity(n_samples + n_workers * chunk_size);
 
@@ -53,7 +57,7 @@ where
                 let mut rng = thread_rng();
 
                 while keep_running.load(Ordering::Acquire) {
-                    let colorings = coloring_generation::<N_COLORS, P, _>(chunk_size, &mut rng);
+                    let colorings = coloring_generation::<P, _>(chunk_size, &mut rng);
                     tx.send(colorings).unwrap();
                 }
             });
@@ -77,19 +81,21 @@ where
     colorings
 }
 
-pub fn generate_colorings<const N_COLORS: usize, P>(
+pub fn generate_colorings<P>(
     n_samples: usize,
     n_workers: usize,
     chunk_size: usize,
-) -> Vec<CompressedColoring<N_COLORS>>
+) -> Vec<CompressedColoring<{ P::N_COLORS }>>
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     let colorings = if n_workers <= 1 {
-        coloring_generation::<N_COLORS, P, _>(n_samples, &mut thread_rng())
+        coloring_generation::<P, _>(n_samples, &mut thread_rng())
     } else {
-        mpsc_coloring_generator::<N_COLORS, P>(n_samples, n_workers, chunk_size)
+        mpsc_coloring_generator::<P>(n_samples, n_workers, chunk_size)
     };
 
     colorings.into_iter().collect()

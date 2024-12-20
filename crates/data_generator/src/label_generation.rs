@@ -1,18 +1,19 @@
 use ndarray::{Array1, Array2};
 use ramsey_theory::{CompressedColoring, CompressedColors, SequenceColoring, SequenceProblem};
 
-fn label_generation<const N_COLORS: usize, P>(
-    colorings: &[CompressedColoring<N_COLORS>],
+fn label_generation<P>(
+    colorings: &[CompressedColoring<{ P::N_COLORS }>],
 ) -> (Vec<u32>, Array2<bool>)
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
-    let mut legal_moves = Array2::from_elem((colorings.len(), N_COLORS), false);
+    let mut legal_moves = Array2::from_elem((colorings.len(), P::N_COLORS), false);
     colorings
         .iter()
         .map(|compressed| {
-            let mut coloring = SequenceColoring::<N_COLORS, P>::new();
+            let mut coloring = SequenceColoring::<P>::new();
             for color in compressed.decompress() {
                 coloring.play(color).unwrap();
             }
@@ -57,16 +58,17 @@ where
     }
 }
 
-pub fn generate_labels<const N_COLORS: usize, P>(
-    mut colorings: Vec<CompressedColoring<N_COLORS>>,
+pub fn generate_labels<P>(
+    mut colorings: Vec<CompressedColoring<{ P::N_COLORS }>>,
 ) -> (Array2<CompressedColors>, Array1<u32>, Array2<bool>)
 where
-    P: SequenceProblem<N_COLORS>,
+    P: SequenceProblem,
     [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
 {
     let (sizes, legal_moves) = label_generation(&colorings);
 
-    CompressedColoring::<N_COLORS>::pad_to_longest(&mut colorings);
+    CompressedColoring::<{ P::N_COLORS }>::pad_to_longest(&mut colorings);
     let colorings = nested_to_array2(colorings);
     let sizes = Array1::from(sizes);
 
