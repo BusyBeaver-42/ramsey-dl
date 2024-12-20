@@ -1,5 +1,4 @@
 use super::coloring::Coloring;
-use ndarray::Array1;
 use std::iter;
 pub type CompressedColors = u32;
 
@@ -72,6 +71,10 @@ impl<const N_COLORS: usize> From<Coloring<N_COLORS>> for CompressedColoring<N_CO
     }
 }
 
+#[cfg(feature = "ndarray")]
+use ndarray::Array1;
+
+#[cfg(feature = "ndarray")]
 impl<const N_COLORS: usize> From<CompressedColoring<N_COLORS>> for Array1<CompressedColors> {
     fn from(coloring: CompressedColoring<N_COLORS>) -> Self {
         Array1::from(coloring.compressed)
