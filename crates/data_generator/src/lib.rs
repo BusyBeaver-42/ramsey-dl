@@ -4,7 +4,7 @@
 use chrono::Local;
 use coloring_generation::generate_colorings;
 use label_generation::generate_labels;
-use ramsey_theory::{SequenceProblem, assert_const_generics::*};
+use ramsey_theory::{SequenceProblem, assert_const_generics::*, problems::Schur};
 use save_data::save_data;
 use std::path::PathBuf;
 
@@ -14,7 +14,7 @@ mod save_data;
 
 // Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
 #[allow(clippy::eq_op)]
-pub fn run<P>(
+fn run_<P>(
     output_filename: Option<PathBuf>,
     n_samples: usize,
     n_workers: Option<usize>,
@@ -34,4 +34,42 @@ pub fn run<P>(
     let (colorings, sizes, legal_moves) = generate_labels::<P>(colorings);
 
     save_data(output_filename, colorings, sizes, legal_moves)
+}
+
+pub trait Run {
+    fn run(
+        &self,
+        output_filename: Option<PathBuf>,
+        n_samples: usize,
+        n_workers: Option<usize>,
+        generation_chunk_size: usize,
+    );
+}
+
+// Clippy false positive: rustc needs `P::N_COLORS == P::N_COLORS`
+#[allow(clippy::eq_op)]
+impl<P> Run for P
+where
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
+    [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
+{
+    fn run(
+        &self,
+        output_filename: Option<PathBuf>,
+        n_samples: usize,
+        n_workers: Option<usize>,
+        generation_chunk_size: usize,
+    ) {
+        run_::<P>(output_filename, n_samples, n_workers, generation_chunk_size)
+    }
+}
+
+pub fn problem_builder(n: usize) -> Box<dyn Run> {
+    if n.is_power_of_two() {
+        Box::new(Schur::<4>)
+    } else {
+        Box::new(Schur::<5>)
+    }
 }

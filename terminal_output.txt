@@ -1,0 +1,103 @@
+PS C:\Users\agero\Documents\projets\ramsey-dl> cargo build
+    Updating crates.io index
+     Locking 102 packages to latest compatible versions
+   Compiling proc-macro2 v1.0.92
+   Compiling unicode-ident v1.0.14
+   Compiling autocfg v1.4.0
+   Compiling windows_x86_64_msvc v0.52.6
+   Compiling cfg-if v1.0.0
+   Compiling thiserror v2.0.8
+   Compiling memchr v2.7.4
+   Compiling once_cell v1.20.2
+   Compiling ucd-trie v0.1.7
+   Compiling byteorder v1.5.0
+   Compiling adler2 v2.0.0
+   Compiling anstyle v1.0.10
+   Compiling crc32fast v1.4.2
+   Compiling getrandom v0.2.15
+   Compiling utf8parse v0.2.2
+   Compiling rawpointer v0.2.1
+   Compiling anstyle-parse v0.2.6
+   Compiling rand_core v0.6.4
+   Compiling miniz_oxide v0.8.2
+   Compiling hashbrown v0.15.2
+   Compiling colorchoice v1.0.3
+   Compiling zip v2.2.2
+   Compiling bumpalo v3.16.0
+   Compiling is_terminal_polyfill v1.70.1
+   Compiling windows-targets v0.52.6
+   Compiling log v0.4.22
+   Compiling windows-sys v0.59.0
+   Compiling simd-adler32 v0.3.7
+   Compiling equivalent v1.0.1
+   Compiling lockfree-object-pool v0.1.6
+   Compiling num-traits v0.2.19
+   Compiling matrixmultiply v0.3.9
+   Compiling clap_lex v0.7.4
+   Compiling zopfli v0.8.1
+   Compiling heck v0.5.0
+   Compiling flate2 v1.0.35
+   Compiling strsim v0.11.1
+   Compiling quote v1.0.37
+   Compiling indexmap v2.7.0
+   Compiling num_cpus v1.16.0
+   Compiling syn v2.0.90
+   Compiling anstyle-wincon v3.0.6
+   Compiling anstyle-query v1.1.2
+   Compiling anstream v0.6.18
+   Compiling num-integer v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling chrono v0.4.39
+   Compiling clap_builder v4.5.23
+   Compiling num-bigint v0.4.6
+   Compiling ndarray v0.16.1
+   Compiling thiserror-impl v2.0.8
+   Compiling zerocopy-derive v0.7.35
+   Compiling displaydoc v0.2.5
+   Compiling clap_derive v4.5.18
+   Compiling zerocopy v0.7.35
+   Compiling pest v2.7.15
+   Compiling ppv-lite86 v0.2.20
+   Compiling clap v4.5.23
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.5
+   Compiling pest_meta v2.7.15
+   Compiling ramsey_theory v0.1.0 (C:\Users\agero\Documents\projets\ramsey-dl\crates\ramsey_theory)
+   Compiling pest_generator v2.7.15
+   Compiling pest_derive v2.7.15
+   Compiling py_literal v0.4.0
+   Compiling ndarray-npy v0.9.1
+   Compiling data_generator v0.1.0 (C:\Users\agero\Documents\projets\ramsey-dl\crates\data_generator)
+warning: unused import: `Run`
+ --> crates\data_generator\src\main.rs:2:22
+  |
+2 | use data_generator::{Run, problem_builder};
+  |                      ^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+note: no errors encountered even though delayed bugs were created
+
+note: those delayed bugs will now be shown as internal compiler errors
+
+error: internal compiler error: Missing value for constant, but no error reported?
+  |
+  = note: delayed at compiler\rustc_trait_selection\src\traits\const_evaluatable.rs:132:44 - disabled backtrace
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: please make sure that you have updated to the latest nightly
+
+note: please attach the file at `C:\Users\agero\Documents\projets\ramsey-dl\rustc-ice-2024-12-21T09_41_44-126548.txt` to your bug report
+
+note: compiler flags: --crate-type bin -C embed-bitcode=no -C debuginfo=2 -C incremental=[REDACTED]
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+end of query stack
+warning: `data_generator` (bin "data_generator") generated 1 warning
+error: could not compile `data_generator` (bin "data_generator"); 1 warning emitted
+
+Caused by:
+  process didn't exit successfully: `C:\Users\agero\.rustup\toolchains\nightly-2024-12-20-x86_64-pc-windows-msvc\bin\rustc.exe --crate-name data_generator --edition=2024 crates\data_generator\src\main.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --diagnostic-width=208 --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --check-cfg cfg(docsrs) --check-cfg "cfg(feature, values())" -C metadata=a474853c577f4b59 --out-dir C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps -C incremental=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\incremental -L dependency=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps --extern chrono=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libchrono-ebda97092c3a0f79.rlib --extern clap=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libclap-c768f8d25bd4f94b.rlib --extern data_generator=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libdata_generator-b9ca6c4d0c55ed2d.rlib --extern ndarray=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libndarray-d1f88059afe440c1.rlib --extern ndarray_npy=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libndarray_npy-dff64f6d00bc2767.rlib --extern num_cpus=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libnum_cpus-d77dd061727f496a.rlib --extern ramsey_theory=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\libramsey_theory-cbb51f9d5ea2213b.rlib --extern rand=C:\Users\agero\Documents\projets\ramsey-dl\target\debug\deps\librand-8e23f43a890f3fb1.rlib -L native=C:\Users\agero\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\windows_x86_64_msvc-0.52.6\lib` (exit code: 101)

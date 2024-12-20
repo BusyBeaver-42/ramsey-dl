@@ -1,11 +1,12 @@
 use clap::{Parser, ValueEnum};
+use data_generator::{Run, problem_builder};
 use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, about)]
 struct Cli {
     #[arg(short, long)]
-    colors: u8,
+    colors: usize,
 
     #[arg(short, long)]
     #[arg(default_value_t = 100_000)]
@@ -34,5 +35,7 @@ enum Problem {
 fn main() {
     let cli = Cli::parse();
 
-    println!("Hello, world!");
+    let colors = cli.colors;
+    let asdf = problem_builder(colors);
+    asdf.run(cli.output_file, cli.samples, cli.workers, cli.chunk_size);
 }
