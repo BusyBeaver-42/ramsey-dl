@@ -1,9 +1,9 @@
 use ndarray::{Array1, Array2};
 use ndarray_npy::NpzWriter;
-use std::fs::File;
+use std::{fs::File, path::PathBuf};
 
 pub fn save_data(
-    filename: &str,
+    filename: PathBuf,
     colorings: Array2<u32>,
     sizes: Array1<u32>,
     legal_moves: Array2<bool>,
