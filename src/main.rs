@@ -1,57 +1,27 @@
 #![feature(generic_const_exprs)]
 
-enum Assert<const CHECK: bool> {}
+struct Struct;
+trait Trait {
+    const CONST: usize = 0;
+}
+impl Trait for Struct {}
 
-trait IsTrue {}
+fn f_<T>() {}
 
-impl IsTrue for Assert<true> {}
-
-trait UpperBound {}
-
-trait SequenceProblem: UpperBound {
-    const N_COLORS: usize;
-
-    fn play();
+trait DynTrait {
+    fn f(&self);
 }
 
-struct Schur<const N_COLORS: usize>
+impl<T> DynTrait for T
 where
-    Self: UpperBound;
-
-impl UpperBound for Schur<1> {}
-
-impl<const N_COLORS: usize> SequenceProblem for Schur<N_COLORS>
-where
-    Self: UpperBound,
+    T: Trait,
+    [(); T::CONST]:,
 {
-    const N_COLORS: usize = N_COLORS;
-
-    fn play() {}
-}
-
-fn run_<P>()
-where
-    P: SequenceProblem,
-    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
-    [(); P::N_COLORS]:,
-{
-}
-
-trait Run {
-    fn run(&self);
-}
-
-impl<P> Run for P
-where
-    P: SequenceProblem,
-    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
-    [(); P::N_COLORS]:,
-{
-    fn run(&self) {
-        run_::<P>()
+    fn f(&self) {
+        f_::<T>()
     }
 }
 
 fn main() {
-    Box::new(Schur::<1>).run();
+    Box::new(Struct).f();
 }
