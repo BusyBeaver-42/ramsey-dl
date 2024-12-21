@@ -1,7 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
-use ramsey_theory::{Assert, IsTrue, Schur, SequenceProblem};
+use reproduce_crash::{Assert, IsTrue, Schur, SequenceProblem};
 
 fn run_<P>()
 where
