@@ -28,14 +28,6 @@ where
     }
 }
 
-pub fn problem_builder(n: usize) -> Box<dyn Run> {
-    if n.is_power_of_two() {
-        Box::new(Schur::<4>)
-    } else {
-        Box::new(Schur::<5>)
-    }
-}
-
 fn main() {
-    problem_builder(42).run();
+    Box::new(Schur::<1>).run();
 }
