@@ -1,15 +1,32 @@
-#![allow(incomplete_features)]
-#![feature(generic_const_exprs)]
+pub enum Assert<const CHECK: bool> {}
 
-pub mod assert_const_generics;
-pub mod colorings;
-pub mod problems;
+pub trait IsTrue {}
 
-pub type Array2D<const N_ROWS: usize, const N_COLUMNS: usize, T> = [[T; N_COLUMNS]; N_ROWS];
+impl IsTrue for Assert<true> {}
 
-pub use colorings::{
-    coloring::Coloring,
-    compressed_coloring::{CompressedColoring, CompressedColors},
-    sequence_coloring::{PlayError, SequenceColoring},
-};
-pub use problems::SequenceProblem;
+pub trait UpperBound {
+    const BOUND: usize;
+}
+
+pub trait SequenceProblem: UpperBound {
+    const N_COLORS: usize;
+
+    fn play();
+}
+
+pub struct Schur<const N_COLORS: usize>
+where
+    Self: UpperBound;
+
+impl UpperBound for Schur<1> {
+    const BOUND: usize = 1;
+}
+
+impl<const N_COLORS: usize> SequenceProblem for Schur<N_COLORS>
+where
+    Self: UpperBound,
+{
+    const N_COLORS: usize = N_COLORS;
+
+    fn play() {}
+}
