@@ -1,4 +1,3 @@
-#![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
 enum Assert<const CHECK: bool> {}
@@ -7,9 +6,7 @@ trait IsTrue {}
 
 impl IsTrue for Assert<true> {}
 
-trait UpperBound {
-    const BOUND: usize;
-}
+trait UpperBound {}
 
 trait SequenceProblem: UpperBound {
     const N_COLORS: usize;
@@ -21,9 +18,7 @@ struct Schur<const N_COLORS: usize>
 where
     Self: UpperBound;
 
-impl UpperBound for Schur<1> {
-    const BOUND: usize = 1;
-}
+impl UpperBound for Schur<1> {}
 
 impl<const N_COLORS: usize> SequenceProblem for Schur<N_COLORS>
 where
@@ -38,7 +33,6 @@ fn run_<P>()
 where
     P: SequenceProblem,
     Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
-    [(); P::BOUND]:,
     [(); P::N_COLORS]:,
 {
 }
@@ -51,7 +45,6 @@ impl<P> Run for P
 where
     P: SequenceProblem,
     Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
-    [(); P::BOUND]:,
     [(); P::N_COLORS]:,
 {
     fn run(&self) {
