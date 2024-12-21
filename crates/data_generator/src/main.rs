@@ -1,41 +1,41 @@
-use clap::{Parser, ValueEnum};
-use data_generator::{Run, problem_builder};
-use std::path::PathBuf;
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
 
-#[derive(Parser)]
-#[command(version, about)]
-struct Cli {
-    #[arg(short, long)]
-    colors: usize,
+use ramsey_theory::{SequenceProblem, assert_const_generics::*, problems::Schur};
 
-    #[arg(short, long)]
-    #[arg(default_value_t = 100_000)]
-    samples: usize,
-
-    #[arg(short, long)]
-    output_file: Option<PathBuf>,
-
-    #[arg(short, long)]
-    workers: Option<usize>,
-
-    #[arg(short, long)]
-    #[arg(default_value_t = 500)]
-    chunk_size: usize,
-
-    #[arg(short, long, value_enum)]
-    problem: Problem,
+fn run_<P>()
+where
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
+    [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
+{
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Problem {
-    Schur,
-    WeakSchur,
+pub trait Run {
+    fn run(&self);
+}
+
+impl<P> Run for P
+where
+    P: SequenceProblem,
+    Assert<{ P::N_COLORS == P::N_COLORS }>: IsTrue,
+    [(); P::BOUND]:,
+    [(); P::N_COLORS]:,
+{
+    fn run(&self) {
+        run_::<P>()
+    }
+}
+
+pub fn problem_builder(n: usize) -> Box<dyn Run> {
+    if n.is_power_of_two() {
+        Box::new(Schur::<4>)
+    } else {
+        Box::new(Schur::<5>)
+    }
 }
 
 fn main() {
-    let cli = Cli::parse();
-
-    let colors = cli.colors;
-    let asdf = problem_builder(colors);
-    asdf.run(cli.output_file, cli.samples, cli.workers, cli.chunk_size);
+    problem_builder(42).run();
 }

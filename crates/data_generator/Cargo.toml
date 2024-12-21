@@ -4,10 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chrono = "0.4.39"
-clap = { version = "4.5.23", features = ["derive"] }
-ndarray = "0.16.1"
-ndarray-npy = { version = "0.9.1", default-features = false, features = ["compressed_npz"] }
-num_cpus = "1.16.0"
-ramsey_theory = { path = "../ramsey_theory", features = ["ndarray"] }
-rand = "0.8.5"
+ramsey_theory = { path = "../ramsey_theory" }
